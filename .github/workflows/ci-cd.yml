@@ -27,8 +27,8 @@ jobs:
 
     - name: Configurar Kubeconfig
       run: |
-        echo ${{ secrets.KUBE_CONFIG }} | base64 -d > kubeconfig.yaml
+        echo ${{ secrets.KUBE_CONFIG_DATA }} | base64 -d > kubeconfig.yaml
 
     - name: Deploy no Kubernetes
       run: |
-        kubectl --kubeconfig=kubeconfig.yaml apply -f k8s/deployment.yaml
+        kubectl --kubeconfig=kubeconfig.yaml apply -f ../../deployment.yaml
