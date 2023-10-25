@@ -23,7 +23,9 @@ jobs:
           context: .
           file: ./src/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/app-web:v1
+            ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
         
   deploy-to-kubernetes:
     runs-on: ubuntu-latest
