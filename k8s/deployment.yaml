@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: meu-app
+  name: app-web
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: meu-app
+      app: app-web
   template:
     metadata:
       labels:
-        app: meu-app
+        app: app-web
     spec:
       containers:
-        - name: meu-app-container
+        - name: app-web-container
           image: davicarneiro/app-web:latest  # Substitua com o nome da sua imagem
           ports:
             - containerPort: 8080
@@ -21,10 +21,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: meu-app-service
+  name: app-web-service
 spec:
   selector:
-    app: meu-app
+    app: app-web
   ports:
     - protocol: TCP
       port: 80
