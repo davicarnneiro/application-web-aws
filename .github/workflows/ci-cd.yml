@@ -26,21 +26,42 @@ jobs:
           docker push web-app:1.0      
 
 
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout Código
+  #       uses: actions/checkout@v2
+
+  #     - name: Configurar kubectl
+  #       run: |
+  #         aws eks --region us-east-1 update-kubeconfig --name imersao-eks
+  #         kubectl config use-context imersao-eks
+
+  #     - name: Aplicar manifestos no Kubernetes
+  #       run: |
+  #        kubectl apply -f ./k8s/deployment.yaml
+
   deploy:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Código
-        uses: actions/checkout@v2
+    - name: Configure AWS CLI
+      run: |
+        echo ${{ secrets.AWS_ACCESS_KEY_ID }} >> ${{ secrets.AWS_ACCESS_KEY_ID }}
+        echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set aws_access_key_id $(cat aws_access_key)
+        aws configure set aws_secret_access_key $(cat aws_secret_key)
+        rm aws_access_key aws_secret_key
 
-      - name: Configurar kubectl
-        run: |
-          aws eks --region us-east-1 update-kubeconfig --name imersao-eks
-          kubectl config use-context imersao-eks
+    - name: Install kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
 
-      - name: Aplicar manifestos no Kubernetes
-        run: |
-         kubectl apply -f ./k8s/deployment.yaml
-
+    - name: Deploy to EKS
+      run: |
+        kubectl apply -f k8s/deployment.yaml
   
