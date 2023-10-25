@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Docker Build, Push, e Kubernetes Deploy
 
 on:
   push:
@@ -25,46 +25,19 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
         
-  
-  deploy:
+  deploy-to-kubernetes:
+    needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v2
+    - name: Checkout Código
+      uses: actions/checkout@v2
 
-      - name: Configurar kubectl
-        run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-          kubectl version --client
+    - name: Configurar AWS CLI
+      run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ secrets.AWS_REGION }}
 
-      - name: Configurar AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Substitua pela região desejada
+    - name: Configurar Kubeconfig
+      run: aws eks --region us-east-1 update-kubeconfig --name imersao-eks
 
-      - name: Fazer o deploy no Kubernetes
-        run: |
-          kubectl apply -f k8s/deployment.yaml  # Substitua pelo caminho do seu arquivo de configuração do Kubernetes
-
-
-  # deploy-to-kubernetes:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #   - name: Checkout Código
-  #     uses: actions/checkout@v2
-
-  #   - name: Configurar AWS CLI
-  #     run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ secrets.AWS_REGION }}
-
-  #   - name: Configurar Kubeconfig
-  #     run: aws eks --region us-east-1 update-kubeconfig --name imersao-eks
-
-  #   - name: Aplicar Configurações do Kubernetes
-  #     run: kubectl apply -f ./k8s/deployment.yaml
+    - name: Aplicar Configurações do Kubernetes
+      run: kubectl apply -f ./k8s/deployment.yaml
