@@ -10,10 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Verificar código-fonte
-    #   uses: actions/checkout@v2
-
-    - name: Check out the repo
+    - name: Verificar código-fonte
       uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
