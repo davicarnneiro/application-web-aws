@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: webapp
-        image: davicarneiro/app-web:{{tag}}
+        image: app-web:{{tag}}
         ports:
         - containerPort: 8080
 ---
