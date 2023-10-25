@@ -25,16 +25,16 @@ jobs:
           docker push web-app:latest
           docker push web-app:1.0
 
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #   - name: Configurar o Kubernetes
-  #     uses: azure/k8s-set-context@v1
-  #     with:
-  #       kubeconfig: ${{ secrets.KUBE_CONFIG }}
-  #       namespace: defaul
+    steps:
+    - name: Configurar o Kubernetes
+      uses: azure/k8s-set-context@v1
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        namespace: defaul
 
-  #   - name: Aplicar as configurações no Kubernetes
-  #     run: kubectl apply -f k8s/deployment.yaml
+    - name: Aplicar as configurações no Kubernetes
+      run: kubectl apply -f k8s/deployment.yaml
