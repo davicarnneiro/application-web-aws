@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: web-app
-        image: davicarneiro/web-app:{{tag}}
+        image: davicarneiro/kube-news-aula:{{tag}}
         ports:
         - containerPort: 8080
 ---
