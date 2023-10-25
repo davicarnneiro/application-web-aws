@@ -41,6 +41,6 @@ jobs:
     - name: Aplicar Configurações do Kubernetes
       run: kubectl apply -f k8s/deployment.yaml
 
-    - name: Atualizar Imagem do Contêiner (se necessário)
-      run: |
-        kubectl set image deployment/seu-deployment seu-container=seu-repo-docker:latest
+    # - name: Atualizar Imagem do Contêiner (se necessário)
+    #   run: |
+    #     kubectl set image deployment/seu-deployment seu-container=seu-repo-docker:latest
