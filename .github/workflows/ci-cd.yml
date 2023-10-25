@@ -49,8 +49,8 @@ jobs:
     steps:
     - name: Configure AWS CLI
       run: |
-        echo ${{ secrets.AWS_ACCESS_KEY_ID }} >> ${{ secrets.AWS_ACCESS_KEY_ID }}
-        echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        echo ${{ secrets.AWS_ACCESS_KEY_ID }} >> AKIASDCTPFJHBBIIIQRC
+        echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> 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
         aws configure set aws_access_key_id $(cat aws_access_key)
         aws configure set aws_secret_access_key $(cat aws_secret_key)
         rm aws_access_key aws_secret_key
