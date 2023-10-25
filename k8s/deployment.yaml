@@ -5,14 +5,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: webapp
+      app: web-app
   template:
     metadata:
       labels:
-        app: webapp
+        app: web-app
     spec:
       containers:
-      - name: webapp
+      - name: web-app
         image: davicarneiro/app-web:{{tag}}
         ports:
         - containerPort: 8080
@@ -23,7 +23,7 @@ metadata:
   name: web-app
 spec:
   selector:
-    app: webapp
+    app: web-app
   ports:
   - port: 80
     targetPort: 8080
