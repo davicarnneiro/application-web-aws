@@ -108,5 +108,5 @@ jobs:
       - name: Aplicar Configurações do Kubernetes
         run: kubectl apply -f ./k8s/deployment.yaml
 
-      - name: Atualizar Imagem do Contêiner (se necessário)
-        run: kubectl set image deployment/app-web app-web=davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
+      # - name: Atualizar Imagem do Contêiner (se necessário)
+      #   run: kubectl set image deployment/app-web app-web=davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
