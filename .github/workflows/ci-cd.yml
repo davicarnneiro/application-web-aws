@@ -25,18 +25,17 @@ jobs:
           docker push web-app:latest
           docker push web-app:1.0
 
+    - name: Build Docker images
+      run: docker build -t web-app:latest .
 
-    # - name: Build Docker images
-    #   run: docker build -t web-app:latest .
+    - name: Push Docker images
+      run: docker push web-app:latest
 
-    # - name: Push Docker images
-    #   run: docker push web-app:latest
+    - name: Construir a imagem Docker
+      run: docker build -t web-app:latest .
 
-    # - name: Construir a imagem Docker
-    #   run: docker build -t web-app:latest .
-
-    # - name: Fazer push da imagem para o Docker Hub
-    #   run: docker push web-app:latest
+    - name: Fazer push da imagem para o Docker Hub
+      run: docker push web-app:latest
 
   # deploy:
   #   needs: build
