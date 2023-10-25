@@ -17,9 +17,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # -
+      #   name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
       -
         name: Build and Push
         uses: docker/build-push-action@v5
@@ -27,26 +27,7 @@ jobs:
           context: .
           file: ./src/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Verificar código-fonte
-#       uses: actions/checkout@v4
-
-#     - name: Log in to Docker Hub
-#       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-#       with:
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKER_PASSWORD }}
-#          run: |
-#           docker build -t web-app:latest .
-#           echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-#           docker tag web-app:latest web-app:1.0
-#           docker push web-app:latest
-#           docker push web-app:1.0      
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest    
 
   deploy:
     runs-on: ubuntu-latest
