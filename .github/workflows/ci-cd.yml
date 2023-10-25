@@ -1,0 +1,37 @@
+name: CI/CD para Docker Hub e Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Verificar código-fonte
+      uses: actions/checkout@v2
+
+    - name: Fazer login no Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Construir a imagem Docker
+      run: docker build -t web-app:latest .
+
+    - name: Fazer push da imagem para o Docker Hub
+      run: docker push web-app:latest
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #   - name: Configurar o Kubernetes
+  #     uses: azure/k8s-set-context@v1
+  #     with:
+  #       kubeconfig: ${{ secrets.KUBE_CONFIG }}
+  #       namespace: defaul
+
+  #   - name: Aplicar as configurações no Kubernetes
+  #     run: kubectl apply -f k8s/deployment.yaml
