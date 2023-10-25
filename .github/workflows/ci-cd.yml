@@ -26,7 +26,6 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
         
   deploy-to-kubernetes:
-    needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
