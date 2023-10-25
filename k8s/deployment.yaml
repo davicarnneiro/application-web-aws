@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app-web-container
-          image: davicarneiro/app-web:v1  # Substitua com o nome da sua imagem
+          image: davicarneiro/app-web:latest  # Substitua com o nome da sua imagem
           ports:
             - containerPort: 8080
 ---
