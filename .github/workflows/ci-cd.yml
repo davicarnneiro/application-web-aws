@@ -49,7 +49,7 @@ jobs:
 
       - name: Fazer o deploy no Kubernetes
         run: |
-          kubectl apply -f ./k8s/deployment.yaml  # Substitua pelo caminho do seu arquivo de configuração do Kubernetes
+          kubectl apply -f k8s/deployment.yaml  # Substitua pelo caminho do seu arquivo de configuração do Kubernetes
 
 
   # deploy-to-kubernetes:
