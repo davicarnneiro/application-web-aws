@@ -43,7 +43,7 @@ jobs:
       run: aws eks --region us-east-1 update-kubeconfig --name imersao-eks
 
     - name: Aplicar Configurações do Kubernetes
-      run: kubectl apply -f k8s/deployment.yaml
+      run: kubectl apply -f ./k8s/deployment.yaml
 
     # - name: Atualizar Imagem do Contêiner (se necessário)
     #   run: |
