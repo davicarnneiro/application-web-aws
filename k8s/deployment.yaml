@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appweb
+  name: webapp
 spec:
   selector:
     matchLabels:
-      app: appweb
+      app: webapp
   template:
     metadata:
       labels:
-        app: appweb
+        app: webapp
     spec:
       containers:
-      - name: appweb
+      - name: webapp
         image: davicarneiro/app-web:{{tag}}
         ports:
         - containerPort: 8080
@@ -20,10 +20,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: appweb
+  name: webapp
 spec:
   selector:
-    app: appweb
+    app: webapp
   ports:
   - port: 80
     targetPort: 8080
