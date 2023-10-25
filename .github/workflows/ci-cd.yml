@@ -60,5 +60,4 @@ jobs:
       run: kubectl apply -f ./k8s/deployment.yaml
 
     - name: Atualizar Imagem do Contêiner (se necessário)
-      run: |
-        kubectl set image deployment/app-web app-web=${{ secrets.DOCKERHUB_USERNAME }}/app-web:${{ secrets.DOCKERHUB_USERNAME }}
+      run: kubectl set image deployment/app-web app-web=${{ secrets.DOCKERHUB_USERNAME }}/app-web:${{steps.docker_meta.outputs.tags}}
