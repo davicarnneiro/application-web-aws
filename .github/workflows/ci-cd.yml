@@ -22,7 +22,7 @@ jobs:
       run: docker tag app-web:latest seuusuario/app-web:latest
 
     - name: Fazer push da imagem para o DockerHub
-      run: docker push seuusuario/app-web:latest
+      run: docker push davicarneiro/app-web:latest
 # jobs:
 #   build:
 #     runs-on: ubuntu-latest
