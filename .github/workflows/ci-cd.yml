@@ -37,7 +37,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{steps.docker_meta.outputs.tags}}
+          tags: davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
           labels: ${{steps.docker_meta.outputs.labels}}
             
            # ${{ steps.docker_meta.outputs.tags }}
@@ -60,4 +60,4 @@ jobs:
       run: kubectl apply -f ./k8s/deployment.yaml
 
     - name: Atualizar Imagem do Contêiner (se necessário)
-      run: kubectl set image deployment/app-web app-web=${{ secrets.DOCKERHUB_USERNAME }}/app-web:${{steps.docker_meta.outputs.tags}}
+      run: kubectl set image deployment/app-web app-web=davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
