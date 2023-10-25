@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Docker meta
         id: docker_meta
@@ -34,12 +34,14 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./src/Dockerfile
+          file: ./Dockerfile
           platforms: linux/amd64, linux/arm64, linux386
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/app-web:v1
-            ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
+          tags: ${{steps.docker_meta.outputs.tags}}
+          labels: ${{steps.docker_meta.outputs.labels}}
+            
+           # ${{ steps.docker_meta.outputs.tags }}
+           # ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
         
   deploy-to-kubernetes:
     runs-on: ubuntu-latest
