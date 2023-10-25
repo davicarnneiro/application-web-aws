@@ -46,7 +46,7 @@ jobs:
       run: echo ${{ secrets.KUBE_CONFIG_DATA }} > kubeconfig.yaml
 
     - name: Fazer o Deploy no Kubernetes
-      run: kubectl apply -f kubeconfig.yaml -f k8s/deployment.yaml
+      run: kubectl apply -f kubeconfig.yaml -f ./k8s/deployment.yaml
 
 
 

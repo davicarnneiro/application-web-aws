@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp
+  name: web-app
 spec:
   selector:
     matchLabels:
-      app: webapp
+      app: web-app
   template:
     metadata:
       labels:
-        app: webapp
+        app: web-app
     spec:
       containers:
-      - name: webapp
+      - name: web-app
         image: davicarneiro/web-app:{{tag}}
         ports:
         - containerPort: 8080
@@ -20,10 +20,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp
+  name: web-app
 spec:
   selector:
-    app: webapp
+    app: web-app
   ports:
   - port: 80
     targetPort: 8080
