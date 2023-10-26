@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app-web-container
-          image: davicarneiro/app-web:v1
+          image: docker.io/davicarneiro/app-web:latest
           ports:
             - containerPort: 8080
 ---

@@ -63,7 +63,6 @@ jobs:
             images: davicarneiro/app-web
             tag-sha: true
 
-
         - name: QEMU
           uses: docker/setup-qemu-action@v1
 
@@ -107,6 +106,3 @@ jobs:
 
       - name: Aplicar Configurações do Kubernetes
         run: kubectl apply -f ./k8s/deployment.yaml
-
-      # - name: Atualizar Imagem do Contêiner (se necessário)
-      #   run: kubectl set image deployment/app-web app-web=davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
