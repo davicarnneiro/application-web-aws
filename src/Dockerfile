@@ -1,6 +1,7 @@
 # Use a imagem base desejada
 FROM node:18.18.0
 
+RUN mkdir -p /app
 # Defina o diretório de trabalho no contêiner
 WORKDIR /app
 
