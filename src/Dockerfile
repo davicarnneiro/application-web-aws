@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Copie os arquivos do seu aplicativo para o contêiner
 COPY package.json package-lock.json ./
-COPY src ./src
 
 # Instale as dependências do aplicativo
 RUN npm install
