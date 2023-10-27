@@ -32,7 +32,7 @@ jobs:
     - name: Push da imagem para o ECR
       run: |
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-      working-directory: ./src .
+      working-directory: ./src
 
     - name: Configurar Kubectl
       run: |
