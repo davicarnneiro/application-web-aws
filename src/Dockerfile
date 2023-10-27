@@ -1,8 +1,6 @@
 # Use a imagem base desejada
 FROM node:18.18.0
 
-ADD . /web-app-aws/
-
 # Defina o diretório de trabalho no contêiner
 WORKDIR /app
 
