@@ -27,7 +27,7 @@ jobs:
       run: |
         docker build -t phibro-teste-app:latest .
         docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-      working-directory: ./Projetos/web-app-aws/Dockerfile
+      working-directory: /home/davi/Projetos/web-app-aws/Dockerfile
 
     - name: Push da imagem para o ECR
       run: |
