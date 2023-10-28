@@ -13,7 +13,7 @@ spec:
         app: phibro-teste-app
     spec:
       containers:
-        - name: web-app-repo
+        - name: phibro-teste-app
           image: 144056461902.dkr.ecr.us-west-1.amazonaws.com/web-app-repo:latest
           ports:
             - containerPort: 8080
