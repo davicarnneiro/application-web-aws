@@ -24,16 +24,24 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-    - name: Verificar se a imagem já existe no ECR
-      id: check-ecr
+    - name: Verificar imagem no ECR
+      id: check-ecr-image
       run: |
-        if aws ecr describe-images --repository-name web-app-repo:latest --image-ids imageTag=latest | grep -q 'imageDetails'; then
-          echo "Imagem já existe no ECR. Nenhuma ação necessária."
-          exit 0
+        IMAGE_NAME="latest"  # Substitua pelo nome da sua imagem
+        REGION="us-west-1"    # Substitua pela região do seu ECR
+
+        # Verificar se a imagem já existe no ECR
+        if aws ecr describe-images --repository-name latest --region ${{ secrets.AWS_REGION }} | grep -q "imageDigest"; then
+          echo "A imagem já existe no ECR."
+          echo "Você pode adicionar comandos adicionais aqui, se necessário."
+          exit 0  # Não interrompe o fluxo
         else
-          echo "Imagem não existe no ECR. Continuando com o push."
-          exit 1
+          echo "A imagem não existe no ECR. Continuando com a construção e envio."
         fi
+      # env:
+      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
 
     - name: Build da imagem Docker
