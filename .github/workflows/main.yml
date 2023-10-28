@@ -50,10 +50,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      
+      - name: Configurar Kubectl
+        run: |
+          aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
 
       - name: Aplicar manifestos no Kubernetes
         run: |
-          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f ./k8s/deployment.yaml
+        env:
+          KUBECONFIG: ${{ runner.workspace }}/kubeconfig
 
     # - name: Configurar Kubectl
     #   run: |
