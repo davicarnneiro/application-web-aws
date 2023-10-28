@@ -23,7 +23,7 @@ jobs:
 
       - name: Build e empurre a imagem para o ECR
         run: |
-          docker build -t phibro-teste-app:latest .
+          docker build -t --no-cache phibro-teste-app:latest .
           docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
 
