@@ -61,6 +61,7 @@ jobs:
       needs: build
       runs-on: ubuntu-latest
 
+  steps:
     - name: Instalar o AWS CLI
       run: |
         sudo apt-get update
