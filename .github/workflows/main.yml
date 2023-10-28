@@ -58,6 +58,7 @@ jobs:
       - name: Fazer o deploy no Kubernetes
         run: |
           aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
+          pwd
           kubectl apply -f web-app-aws/k8s/deployment.yaml
 
   # deploy:
