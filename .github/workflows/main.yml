@@ -78,7 +78,7 @@ jobs:
         run: |
           aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
           pwd
-          kubectl apply -f ../k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
 
   # deploy:
   #   runs-on: ubuntu-latest
