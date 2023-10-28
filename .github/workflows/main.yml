@@ -23,25 +23,18 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-    # - name: Build da imagem Docker
-    #   run: |
-    #     docker build -t phibro-teste-app:latest .
-    #     docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-    #   working-directory: ./src
 
-    - name: Build e Push da imagem Docker
-      id: build-and-push
+    - name: Build da imagem Docker
       run: |
         docker build -t phibro-teste-app:latest .
         docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-        working-directory: ./src
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-        working-directory: ./src
+      working-directory: ./src
 
-    # - name: Push da imagem para o ECR
-    #   run: |
-    #     docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-    #   working-directory: ./src
+
+    - name: Push da imagem para o ECR
+      run: |
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
+      working-directory: ./src
 
     - name: Configurar Kubectl
       run: |
