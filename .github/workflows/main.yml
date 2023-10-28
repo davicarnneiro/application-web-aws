@@ -6,7 +6,7 @@ on:
       - main # Troque para a branch que deseja usar
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
