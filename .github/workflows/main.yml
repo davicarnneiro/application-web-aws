@@ -84,6 +84,7 @@ jobs:
           pwd
           cd work
           cd web-app-aws
+          cd web-app-aws
           ls -la
           
 
