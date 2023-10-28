@@ -24,22 +24,23 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-    - name: Build da imagem Docker
-      run: |
-        docker build -t web-app-repo .
-        docker tag web-app-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
-      working-directory: ./src
-
     - name: Verificar se a imagem já existe no ECR
       id: check-ecr
       run: |
-        if aws ecr describe-images --repository-name web-app-repo --image-ids imageTag=latest | grep -q 'imageDetails'; then
+        if aws ecr describe-images --repository-name web-app-repo:latest --image-ids imageTag=latest | grep -q 'imageDetails'; then
           echo "Imagem já existe no ECR. Nenhuma ação necessária."
           exit 0
         else
           echo "Imagem não existe no ECR. Continuando com o push."
           exit 1
         fi
+
+
+    - name: Build da imagem Docker
+      run: |
+        docker build -t web-app-repo .
+        docker tag web-app-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
+      working-directory: ./src
 
 
     - name: Push da imagem para o ECR
