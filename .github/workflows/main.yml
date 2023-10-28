@@ -82,7 +82,8 @@ jobs:
           aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
           cd
           pwd
-          cd work/web-app-aws/web-app-aws
+          cd work
+          cd web-app-aws
           ls -la
           
 
