@@ -1,4 +1,4 @@
-name: CI/CD para AWS EKS
+name: Pipeline AWS Kubernetes
 
 on:
   push:
@@ -6,37 +6,44 @@ on:
       - main
 
 jobs:
-  build-push-ecr:
+  build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout do código
+      - name: Checkout código
         uses: actions/checkout@v2
 
-      - name: Fazer login no AWS ECR
-        run: ${{ secrets.AWS_ACCESS_KEY_ID }} | aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      - name: Login no AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build e empurre a imagem para o ECR
+      - name: Build da aplicação
         run: |
-          docker build -t --no-cache phibro-teste-app:latest .
-          docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
+          docker build -t phibro-teste-app .
+          echo ${{ steps.login-ecr.outputs.registry }}
+          docker tag phibro-teste-app:latest ${{ steps.login-ecr.outputs.registry }}/phibro-teste-app:latest
 
-  deploy-eks:
-    needs: build-push-ecr
+      - name: Push no ECR
+        id: push-ecr
+        run: |
+          docker push ${{ steps.login-ecr.outputs.registry }}/phibro-teste-app:latest
+          echo "::set-output name=image::${{ steps.login-ecr.outputs.registry }}/phibro-teste-app:latest"
+
+  deploy:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
-      - name: Configurar kubectl
-        run: aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
+      - name: Configure o Kubernetes
+        uses: azure/k8s-set-context@v1
+        with:
+          kubeconfig: ${{ secrets.KUBECONFIG }}
 
-      - name: Aplicar manifestos do Kubernetes
-        run: kubectl apply -f ./k8s/deployment.yaml
+      - name: Aplicar manifestos no Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+
+
 
   # test:
   #   needs: deploy-eks
