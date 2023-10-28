@@ -55,7 +55,7 @@ jobs:
 
       - name: Fazer o deploy no Kubernetes
         run: |
-          kubectl config use-context ${{ secrets.KUBECONFIG }}
+          kubectl config use-context ${{ secrets.KUBE_CONFIG_CONTEXT }}
           kubectl apply -f k8s/deployment.yaml
 
   # deploy:
