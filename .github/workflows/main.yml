@@ -1,50 +1,97 @@
-name: CI/CD para ECR e Kubernetes
+name: CI/CD para AWS EKS
 
 on:
   push:
     branches:
-      - main # Troque para a branch que deseja usar
+      - main
 
 jobs:
-  build-and-deploy:
+  build-push-ecr:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Verificar código
-      uses: actions/checkout@v2
+      - name: Checkout do código
+        uses: actions/checkout@v2
 
-    - name: Login no Amazon ECR
-      id: login-ecr
-      run: |
-        echo ${{ secrets.AWS_ACCESS_KEY_ID }} | aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      - name: Fazer login no AWS ECR
+        run: aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      - name: Build e empurre a imagem para o ECR
+        run: |
+          docker build -t phibro-teste-app:latest .
+          docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
+
+  deploy-eks:
+    needs: build-push-ecr
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configurar kubectl
+        run: aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
+
+      - name: Aplicar manifestos do Kubernetes
+        run: kubectl apply -f ./k8s/deployment.yaml
+
+  # test:
+  #   needs: deploy-eks
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Executar testes
+  #       run: |
+  #         # Coloque aqui os comandos para executar seus testes
 
 
-    - name: Build da imagem Docker
-      run: |
-        docker build -t phibro-teste-app:latest .
-        docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-      working-directory: ./src
 
 
-    - name: Push da imagem para o ECR
-      run: |
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
-      working-directory: ./src
+# name: CI/CD para ECR e Kubernetes
 
-    - name: Configurar Kubectl
-      run: |
-        aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
-      env:
-        KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+# on:
+#   push:
+#     branches:
+#       - main # Troque para a branch que deseja usar
 
-    - name: Aplicar manifestos do Kubernetes
-      run: |
-        kubectl apply -f ./k8s/deployment.yaml
-      env:
-        KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Verificar código
+#       uses: actions/checkout@v2
+
+#     - name: Login no Amazon ECR
+#       id: login-ecr
+#       run: |
+#         echo ${{ secrets.AWS_ACCESS_KEY_ID }} | aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         AWS_REGION: ${{ secrets.AWS_REGION }}
+#         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+
+#     - name: Build da imagem Docker
+#       run: |
+#         docker build -t phibro-teste-app:latest .
+#         docker tag phibro-teste-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
+#       working-directory: ./src
+
+
+#     - name: Push da imagem para o ECR
+#       run: |
+#         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/phibro-teste-app:latest
+#       working-directory: ./src
+
+#     - name: Configurar Kubectl
+#       run: |
+#         aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
+#       env:
+#         KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+
+#     - name: Aplicar manifestos do Kubernetes
+#       run: |
+#         kubectl apply -f ./k8s/deployment.yaml
+#       env:
+#         KUBECONFIG: ${{ runner.workspace }}/kubeconfig
 
