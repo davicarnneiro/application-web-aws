@@ -56,9 +56,6 @@ jobs:
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
       working-directory: ./src
 
-    - name: Deploy no Kubernetes
-      needs: build
-      runs-on: ubuntu-latest
 
     - name: Configurar as credenciais da AWS
       run: |
