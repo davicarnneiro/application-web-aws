@@ -15,6 +15,11 @@ jobs:
 
       - name: Fazer login no AWS ECR
         run: ${{ secrets.AWS_ACCESS_KEY_ID }} | aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+        env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
       - name: Build e empurre a imagem para o ECR
         run: |
