@@ -16,6 +16,8 @@ jobs:
       - name: Login no AWS ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'false'
 
       - name: Build da aplicação
         run: |
