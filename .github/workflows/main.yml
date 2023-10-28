@@ -56,7 +56,7 @@ jobs:
 
       - name: Fazer o deploy no Kubernetes
         run: |
-          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f ./k8s/deployment.yaml
 
   # deploy:
   #   runs-on: ubuntu-latest
