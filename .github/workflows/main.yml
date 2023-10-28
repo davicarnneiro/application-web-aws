@@ -53,7 +53,7 @@ jobs:
       
       - name: Configurar Kubectl
         run: |
-          aws eks update-kubeconfig --name phibro-testes-eks --region us-west-1
+          aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
 
       - name: Aplicar manifestos no Kubernetes
         run: |
