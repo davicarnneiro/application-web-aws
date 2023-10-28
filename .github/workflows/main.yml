@@ -83,8 +83,8 @@ jobs:
           cd
           pwd
           cd ..
+          cd ..
           pwd
-          ls -la
         
           
 
