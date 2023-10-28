@@ -36,15 +36,29 @@ jobs:
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
       working-directory: ./src
 
-    - name: Configurar Kubectl
-      run: |
-        aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
-      env:
-        KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
 
-    - name: Aplicar manifestos do Kubernetes
-      run: |
-        kubectl apply -f ./k8s/deployment.yaml
-      env:
-        KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+    steps:
+      - name: Configure o Kubernetes
+        uses: azure/k8s-set-context@v1
+        with:
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Aplicar manifestos no Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+
+    # - name: Configurar Kubectl
+    #   run: |
+    #     aws eks update-kubeconfig --name phibro-testes-eks --region ${{ secrets.AWS_REGION }}
+    #   env:
+    #     KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+
+    # - name: Aplicar manifestos do Kubernetes
+    #   run: |
+    #     kubectl apply -f ./k8s/deployment.yaml
+    #   env:
+    #     KUBECONFIG: ${{ runner.workspace }}/kubeconfig
 
