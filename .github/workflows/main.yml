@@ -62,22 +62,22 @@ jobs:
       needs: build
       runs-on: ubuntu-latest
 
-  steps:
-      - name: Instalar o AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
+    # steps:
+    - name: Instalar o AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
 
-      - name: Configurar as credenciais da AWS
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ secrets.AWS_REGION }}
-        env:
-          KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+    - name: Configurar as credenciais da AWS
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set default.region ${{ secrets.AWS_REGION }}
+      env:
+      KUBECONFIG: ${{ runner.workspace }}/kubeconfig
           
 
-      - name: Fazer o deploy no Kubernetes
-        run: |
-          aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
-          kubectl apply -f ./k8s/deployment.yaml
+    - name: Fazer o deploy no Kubernetes
+      run: |
+        aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
+        kubectl apply -f ./k8s/deployment.yaml
