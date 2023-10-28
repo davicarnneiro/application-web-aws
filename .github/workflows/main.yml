@@ -35,6 +35,7 @@ jobs:
         docker build -t phibro-teste-app:latest .
         docker tag phibro-teste-app:latest ${{ secrets.AWS_ECR_REGISTRY_URL }}/phibro-teste-app:latest
         docker push ${{ secrets.AWS_ECR_REGISTRY_URL }}/phibro-teste-app:latest
+        working-directory: ./src
 
     # - name: Push da imagem para o ECR
     #   run: |
