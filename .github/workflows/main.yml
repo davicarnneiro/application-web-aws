@@ -83,4 +83,5 @@ jobs:
           cd
           cd work
           cd web-app-aws
+          cd web-app-aws
           ls -la
