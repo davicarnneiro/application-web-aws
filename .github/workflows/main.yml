@@ -21,8 +21,8 @@ jobs:
         - name: QEMU
           uses: docker/setup-qemu-action@v1
 
-        - name: Docker Buildx
-          uses: docker/setup-buildx-action@v1
+        # - name: Docker Buildx
+        #   uses: docker/setup-buildx-action@v1
 
         - name: Login to Dockerhub
           uses: docker/login-action@v1
@@ -48,6 +48,7 @@ jobs:
         
     deploy-to-kubernetes:
       runs-on: ubuntu-latest
+      needs: build  # Esta linha especifica que esta etapa depende da etapa de build
 
       steps:
       - name: Checkout Código
