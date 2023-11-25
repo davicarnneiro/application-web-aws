@@ -1,48 +1,66 @@
-name: DockerHub and Kubernetes Deployment
-
+name: Docker Build, Push, e Kubernetes Deploy
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches: [main]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
+        
+        steps:
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+        - uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+        - name: Docker meta
+          id: docker_meta
+          uses: crazy-max/ghaction-docker-meta@v1
+          with:
+            images: davicarneiro/app-web-teste
+            tag-sha: true
 
-    - name: Login to DockerHub
-      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: QEMU
+          uses: docker/setup-qemu-action@v1
 
-    - name: Build and Push Docker Image
-      run: |
-        docker buildx create --use
-        docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKERHUB_REPO }}:$GITHUB_SHA -t ${{ secrets.DOCKERHUB_REPO }}:latest .
-        docker push ${{ secrets.DOCKERHUB_REPO }}:$GITHUB_SHA
-        docker push ${{ secrets.DOCKERHUB_REPO }}:latest
+        - name: Docker Buildx
+          uses: docker/setup-buildx-action@v1
 
-  deploy:
-    runs-on: ubuntu-latest
+        - name: Login to Dockerhub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME}}
+            password: ${{ secrets.DOCKERHUB_TOKEN}}
 
-    needs: build
+        - name: Bump version and push tag
+          id: tagging
+          uses: davicarnneiro/github-tag-action@v4.5
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+        - name: Build and push
+          id: docker_build
+          uses: docker/build-push-action@v2
+          with:
+            push: true
+            context: .
+            file: ./Dockerfile
+            platforms: linux/amd64,linux/arm64,linux/386
+            tags: davicarneiro/app-web:${{ steps.tagging.outputs.new_version }}
+        
+    deploy-to-kubernetes:
+      runs-on: ubuntu-latest
 
-    - name: Set up kubectl
-      uses: azure/k8s-set-context@v1
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      steps:
+      - name: Checkout Código
+        uses: actions/checkout@v2
 
-    - name: Deploy to Kubernetes
-      run: kubectl apply -f path/to/your/kubernetes/deployment.yaml
+      - name: Configurar AWS CLI
+        run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ secrets.AWS_REGION }}
+
+      - name: Configurar Kubeconfig
+        run: aws eks --region us-east-1 update-kubeconfig --name imersao-eks
+
+      - name: Aplicar Configurações do Kubernetes
+        run: kubectl apply -f ./k8s/deployment.yaml
 
 
 
