@@ -1,0 +1,59 @@
+name: CI/CD com Build, Push, Deploy e Testes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Código
+      uses: actions/checkout@v2
+
+    - name: Build da Imagem Docker
+      run: docker build -t web-app:latest .
+
+  push:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+    - name: Login no Docker Hub
+      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Push da Imagem Docker para o Docker Hub
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: push
+
+    steps:
+    - name: Configurar kubectl
+      run: echo ${{ secrets.KUBE_CONFIG }} > kubeconfig.yaml
+
+    - name: Fazer o Deploy no Kubernetes
+      run: kubectl apply -f kubeconfig.yaml -f kubernetes-manifests/
+
+    - name: Esperar Implantação
+      run: kubectl rollout status deployment/web-app -n default
+
+  # test:
+  #   runs-on: ubuntu-latest
+
+  #   needs: deploy
+
+  #   steps:
+  #   - name: Checkout Código
+  #     uses: actions/checkout@v2
+
+  #   - name: Executar Testes
+  #     run: |
+  #       # Comandos para executar testes no seu aplicativo após o deploy
+  #       # Exemplo: npm test, python manage.py test, etc.
+
