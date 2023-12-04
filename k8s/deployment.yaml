@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: phibro-teste-app
+  name: web-teste-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: phibro-teste-app
+      app: web-teste-app
   template:
     metadata:
       labels:
-        app: phibro-teste-app
+        app: web-teste-app
     spec:
       containers:
-        - name: phibro-teste-app
+        - name: web-teste-app
           image: 144056461902.dkr.ecr.us-west-1.amazonaws.com/web-app-repo:latest
           ports:
             - containerPort: 8080
@@ -21,10 +21,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: phibro-teste-app
+  name: web-teste-app
 spec:
   selector:
-    app: phibro-teste-app
+    app: web-teste-app
   ports:
     - protocol: TCP
       port: 80
