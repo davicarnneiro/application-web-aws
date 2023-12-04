@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-teste-app
+  name: web-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: web-teste-app
+      app: web-app
   template:
     metadata:
       labels:
-        app: web-teste-app
+        app: web-app
     spec:
       containers:
-        - name: web-teste-app
+        - name: web-app
           image: 144056461902.dkr.ecr.us-west-1.amazonaws.com/web-app-repo:latest
           ports:
             - containerPort: 8080
@@ -21,10 +21,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-teste-app
+  name: web-app
 spec:
   selector:
-    app: web-teste-app
+    app: web-app
   ports:
     - protocol: TCP
       port: 80
