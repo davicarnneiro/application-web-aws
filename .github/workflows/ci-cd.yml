@@ -36,8 +36,8 @@ jobs:
            file: ./Dockerfile
            platforms: linux/amd64, linux/arm64
            push: true
-           tags: davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
-           labels: ${{steps.docker_meta.outputs.labels}}
+           # tags: davicarneiro/app-web:${{steps.docker_meta.outputs.tags}}
+           # labels: ${{steps.docker_meta.outputs.labels}}
             
             # ${{ steps.docker_meta.outputs.tags }}
             # ${{ secrets.DOCKERHUB_USERNAME }}/app-web:latest
