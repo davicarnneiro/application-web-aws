@@ -87,3 +87,4 @@ jobs:
         run: |
           aws eks --region us-west-1 update-kubeconfig --name devops-eks
           kubectl apply -f ./k8s/deployment.yaml
+          
