@@ -1,138 +1,95 @@
-name: Build, Push, and Deploy
+name: CI/CD para ECR e Kubernetes
 
 on:
   push:
     branches:
-      - main
+      - main # Troque para a branch que deseja usar
 
 jobs:
-  build_push_deploy:
+  build:
+    name: Build e Push no ECR
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
+    - name: Verificar código
       uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-
-    - name: Login to DockerHub
-      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-
-    - name: Build and Push Docker Image
+    - name: Login no Amazon ECR
+      id: login-ecr
       run: |
-        docker buildx create --use
-        docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKERHUB_REPO }}:$GITHUB_SHA -t ${{ secrets.DOCKERHUB_REPO }}:latest .
-        docker push ${{ secrets.DOCKERHUB_REPO }}:$GITHUB_SHA
-        docker push ${{ secrets.DOCKERHUB_REPO }}:latest
+        echo ${{ secrets.AWS_ACCESS_KEY_ID }} | aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-    - name: Set up kubectl
-      uses: azure/k8s-set-context@v1
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+    - name: Verificar imagem no ECR
+      id: check-ecr-image
+      run: |
+        IMAGE_NAME="latest"  # Substitua pelo nome da sua imagem
+        REGION="us-west-1"    # Substitua pela região do seu ECR
 
-    - name: Deploy to Kubernetes
-      run: kubectl apply -f path/to/your/kubernetes/deployment.yaml
-
-
-
-
-
-
-
-# name: CI/CD para ECR e Kubernetes
-
-# on:
-#   push:
-#     branches:
-#       - main # Troque para a branch que deseja usar
-
-# jobs:
-#   build:
-#     name: Build e Push no ECR
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Verificar código
-#       uses: actions/checkout@v2
-
-#     - name: Login no Amazon ECR
-#       id: login-ecr
-#       run: |
-#         echo ${{ secrets.AWS_ACCESS_KEY_ID }} | aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-#       env:
-#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         AWS_REGION: ${{ secrets.AWS_REGION }}
-#         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-
-#     - name: Verificar imagem no ECR
-#       id: check-ecr-image
-#       run: |
-#         IMAGE_NAME="latest"  # Substitua pelo nome da sua imagem
-#         REGION="us-west-1"    # Substitua pela região do seu ECR
-
-#         # Verificar se a imagem já existe no ECR
-#         if aws ecr describe-images --repository-name latest --region ${{ secrets.AWS_REGION }} | grep -q "imageDigest"; then
-#           echo "A imagem já existe no ECR."
-#           echo "Você pode adicionar comandos adicionais aqui, se necessário."
-#           exit 0  # Não interrompe o fluxo
-#         else
-#           echo "A imagem não existe no ECR. Continuando com a construção e envio."
-#         fi
-#       env:
-#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+        # Verificar se a imagem já existe no ECR
+        if aws ecr describe-images --repository-name latest --region ${{ secrets.AWS_REGION }} | grep -q "imageDigest"; then
+          echo "A imagem já existe no ECR."
+          echo "Você pode adicionar comandos adicionais aqui, se necessário."
+          exit 0  # Não interrompe o fluxo
+        else
+          echo "A imagem não existe no ECR. Continuando com a construção e envio."
+        fi
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
 
-#     - name: Build da imagem Docker
-#       run: |
-#         docker build -t web-app-repo .
-#         docker tag web-app-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
-#       working-directory: ./src
+    - name: Build da imagem Docker
+      run: |
+        docker build -t web-app-repo .
+        docker tag web-app-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
+      working-directory: ./src
 
 
-#     - name: Push da imagem para o ECR
-#       run: |
-#         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
-#       working-directory: ./src
+    - name: Push da imagem para o ECR
+      run: |
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/web-app-repo:latest
+      working-directory: ./src
 
 
-#     - name: Configurar as credenciais da AWS
-#       run: |
-#         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         aws configure set default.region ${{ secrets.AWS_REGION }}          
+    - name: Configurar as credenciais da AWS
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set default.region ${{ secrets.AWS_REGION }}          
 
-#     - name: Fazer o deploy no Kubernetes
-#       run: |
-#         aws eks --region us-west-1 update-kubeconfig --name devops-eks
-#         kubectl apply -f ./k8s/deployment.yaml
+    - name: Fazer o deploy no Kubernetes
+      run: |
+        aws eks --region us-west-1 update-kubeconfig --name devops-eks
+        kubectl apply -f ./k8s/deployment.yaml
 
 
-#   # deploy:
-#   #   - name: Deploy no Kubernetes
-#   #     needs: build
-#   #     runs-on: ubuntu-latest
+  # deploy:
+  #   - name: Deploy no Kubernetes
+  #     needs: build
+  #     runs-on: ubuntu-latest
 
-#   # steps:
-#   #   - name: Instalar o AWS CLI
-#   #     run: |
-#   #       sudo apt-get update
-#   #       sudo apt-get install -y awscli
+  # steps:
+  #   - name: Instalar o AWS CLI
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install -y awscli
 
-#   #   - name: Configurar as credenciais da AWS
-#   #     run: |
-#   #       aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-#   #       aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#   #       aws configure set default.region ${{ secrets.AWS_REGION }}
-#   #       env:
-#   #         KUBECONFIG: ${{ runner.workspace }}/kubeconfig
+  #   - name: Configurar as credenciais da AWS
+  #     run: |
+  #       aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws configure set default.region ${{ secrets.AWS_REGION }}
+  #       env:
+  #         KUBECONFIG: ${{ runner.workspace }}/kubeconfig
           
 
-#   #   - name: Fazer o deploy no Kubernetes
-#   #     run: |
-#   #       aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
-#   #       kubectl apply -f ./Projetos/web-app-aws/k8s/deployment.yaml
+  #   - name: Fazer o deploy no Kubernetes
+  #     run: |
+  #       aws eks --region us-west-1 update-kubeconfig --name phibro-testes-eks
+  #       kubectl apply -f ./Projetos/web-app-aws/k8s/deployment.yaml
