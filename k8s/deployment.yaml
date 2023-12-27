@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: web-app
-          image: 144056461902.dkr.ecr.us-west-1.amazonaws.com/web-app-repo:latest
+          image: ACCOUNT_ID.dkr.ecr.SUA_REGIAO.amazonaws.com/web-app-repo:latest
           ports:
             - containerPort: 8080
 ---
